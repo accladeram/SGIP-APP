@@ -1,36 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SGIP - Frontend
 
-## Getting Started
+Interfaz web para el Sistema de Gestión de Inversiones y Préstamos.
 
-First, run the development server:
+App: https://sgip-app.vercel.app  
+API (Swagger): https://sgip-api-production-0877.up.railway.app/swagger/index.html
+
+---
+
+## Acceso
+
+No hay autenticación implementada. La pantalla de inicio solicita un **Identificador de Cliente** que actúa como `userId` para todas las operaciones. Puede ser cualquier string, por ejemplo `user-01`, `user-5987`, `cliente-42`.
+
+Los usuarios `user-01` y `user-02` tienen datos de prueba precargados (préstamos y transacciones).
+
+---
+
+## Tecnologías
+
+- Next.js 14+ (App Router) / React / TypeScript
+- TanStack Query — fetching, caché y estados de carga/error
+- React Hook Form + Zod — validación de formularios
+- Tailwind CSS
+
+---
+
+## Arquitectura
+
+```
+src/
+├── app/
+│   ├── page.tsx                   # Home / login por userId
+│   ├── loans/
+│   │   ├── page.tsx               # Lista de préstamos
+│   │   ├── simulate/page.tsx      # Simulador + cronograma
+│   │   └── [id]/page.tsx          # Detalle + cronograma
+│   └── transactions/
+│       └── page.tsx               # Historial de transacciones
+├── components/
+│   ├── LoanSimulator.tsx
+│   ├── PaymentScheduleTable.tsx
+│   ├── LoanList.tsx
+│   └── TransactionList.tsx
+├── services/
+│   ├── loanService.ts
+│   └── transactionService.ts
+├── types/
+│   ├── loan.ts
+│   └── transaction.ts
+└── lib/
+    └── api.ts                     # Cliente HTTP base (fetch/axios)
+```
+
+```mermaid
+graph TD
+    A[Inicio - ingresar userId] --> B[Simulador /loans/simulate]
+    A --> C[Mis Préstamos /loans]
+    B -- solicitar préstamo --> C
+    C --> D[Detalle /loans/:id]
+    A --> E[Historial /transactions]
+```
+
+---
+
+## Correr localmente
+
+**Prerrequisitos:** Node.js 18+
+
+```bash
+git clone https://github.com/accladeram/SGIP-APP.git
+cd SGIP-APP
+npm install
+```
+
+Crear `.env.local` en la raíz:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+App en: `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para apuntar al backend en producción:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_API_URL=https://sgip-api-production-0877.up.railway.app
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Evidencia
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Inicio — ingreso de identificador de cliente**  
+![Inicio](docs/screenshots/Inicio.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Simulador — validación de campos**  
+![Calculadora validación](docs/screenshots/Calculadora_Previo.png)
 
-## Deploy on Vercel
+**Simulador — cuota y cronograma calculados**  
+![Calculadora resultado](docs/screenshots/Calculadora.png)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Detalle del préstamo con cronograma de pagos**  
+![Detalle préstamo](docs/screenshots/Detalle_Prestamo.png)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Historial de transacciones**  
+![Historial transacciones](docs/screenshots/Historial_Transaccion.png)
+
+---
+
+## Limitaciones conocidas
+
+- El campo "Tipo de Préstamo" en la vista de detalle muestra el valor numérico del enum en lugar de la etiqueta (`Fixed` / `Decreasing`).
+- El campo "Actualizado" muestra `Invalid Date` cuando la API retorna `null` en `updatedAt`.
