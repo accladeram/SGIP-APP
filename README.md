@@ -2,9 +2,6 @@
 
 Interfaz web para el Sistema de Gestión de Inversiones y Préstamos.
 
-App: https://sgip-app.vercel.app  
-API (Swagger): https://sgip-api-production-0877.up.railway.app/swagger/index.html
-
 ---
 
 ## Acceso
